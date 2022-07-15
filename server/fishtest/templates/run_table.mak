@@ -49,7 +49,7 @@
 <h4>
 % if toggle:
     <button id="${toggle}-button" class="btn btn-sm btn-light border" onclick="toggle_${toggle}()">
-    ${'Hide' if get_cookie(request, cookie_name)=='Hide' else 'Show'}
+    ${'Show' if get_cookie(request, cookie_name)=='Show' else 'Hide'}
     </button>
 % endif
 % if header is not None and count is not None:
@@ -64,7 +64,7 @@
 <div
    id="${toggle}"
 % if toggle:
-   style="${'' if get_cookie(request, cookie_name)=='Hide' else 'display: none;'}"
+   style="${'display: none;' if get_cookie(request, cookie_name)=='Show' else ''}"
 % endif
 >
 
