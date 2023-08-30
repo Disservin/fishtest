@@ -400,7 +400,7 @@ def verify_required_cutechess(testing_dir, cutechess):
             close_fds=not IS_WINDOWS,
         ) as p:
             errors = p.stderr.read()
-            pattern = re.compile("fast-chess ([0-9]*).([0-9]*).([0-9]*)")
+            pattern = re.compile("fast-chess alpha-([0-9]*).([0-9]*).([0-9]*)")
             major, minor, patch = 0, 0, 0
             for line in iter(p.stdout.readline, ""):
                 m = pattern.search(line)
@@ -458,11 +458,12 @@ def setup_cutechess(worker_dir):
             item_url = (
                 "https://github.com/Disservin/fast-chess/archive/refs/heads/master.zip"
             )
+
+            clone = "git clone https://github.com/Disservin/fast-chess"
             print("Downloading {}".format(item_url))
-            blob = requests_get(item_url).content
-            file_list = unzip(blob, tmp_dir)
-            prefix = os.path.commonprefix([n.filename for n in file_list])
-            os.chdir(tmp_dir / prefix)
+            os.chdir(tmp_dir)
+            os.system(clone)
+            os.chdir(f"{tmp_dir}/fast-chess")
 
             cmd = "make -j USE_CUTE=true"
             with subprocess.Popen(
@@ -481,7 +482,8 @@ def setup_cutechess(worker_dir):
                 )
 
             worker_dir = Path(__file__).resolve().parent
-            testing_dir = worker_dir / "testing"
+            testing_dir = f"{worker_dir}/testing/cutechess-cli{EXE_SUFFIX}"
+            print(f"moving to {testing_dir}")
             shutil.move("fast-chess" + EXE_SUFFIX, testing_dir)
 
         except Exception as e:
@@ -491,6 +493,8 @@ def setup_cutechess(worker_dir):
                 sep="",
                 file=sys.stderr,
             )
+
+        shutil.rmtree(tmp_dir)
 
     os.chdir(curr_dir)
     return ret
