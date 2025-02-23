@@ -1456,7 +1456,9 @@ def fetch_and_handle_task(
     # Upload PGN file.
     if "spsa" not in run["args"]:
         try:
-            crc_actual = hex(zlib.crc32(pgn_file.read_bytes()))
+            file_content = pgn_file.read_bytes()
+
+            crc_actual = hex(zlib.crc32(file_content))
 
             # Check that the file is not corrupted
             if crc_actual != crc_expected:
@@ -1464,8 +1466,8 @@ def fetch_and_handle_task(
                     f"Checksum of file ({crc_actual}) does not match expected value ({crc_expected}).\nSkipping upload."
                 )
             else:
-                # Ignore non UTF-8 characters in PGN file
-                data = pgn_file.read_text(encoding="utf-8", errors="ignore")
+                # Decode bytes to text, ignoring non UTF-8 characters
+                data = file_content.decode("utf-8", errors="ignore")
                 upload_pgn_data(data, run["_id"], task_id, remote, payload)
         except Exception as e:
             print("\nException uploading PGN file:\n", e, sep="", file=sys.stderr)
