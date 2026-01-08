@@ -1,13 +1,8 @@
-from datetime import UTC, datetime
-<<<<<<< HEAD
-
-from fishtest.lru_cache import lru_cache
-=======
+from fishtest.lru_cache import lru_cache, user_schema
 import secrets
 import sys
-from fishtest.lru_cache import LRUCache
->>>>>>> fe6e6aed (use api key)
-from fishtest.schemas import user_schema
+from datetime import UTC, datetime
+
 from pymongo import ASCENDING
 from vtjson import ValidationError, validate
 
@@ -130,29 +125,6 @@ class UserDb:
 
     def _generate_api_key(self):
         return f"ft_{secrets.token_urlsafe(32)}"
-
-    def ensure_worker_api_key(self, username):
-        user = self.get_user(username)
-        if user is None:
-            return None
-        api_key = user.get("api_key")
-        if api_key:
-            return api_key
-
-        # Generate a new API key and attempt to set it atomically, but only if
-        # the user still does not have an API key. This avoids a race where
-        # two workers concurrently create and save different API keys.
-        new_api_key = self._generate_api_key()
-        result = self.users.find_one_and_update(
-            {"_id": user["_id"], "api_key": {"$exists": False}},
-            {"$set": {"api_key": new_api_key}},
-        )
-        if result is not None:
-            # Our update succeeded; the new API key was stored.
-            self.clear_cache()
-            return new_api_key
-        user = self.get_user(username)
-        return user.get("api_key") if user else None
 
     def remove_user(self, user, rejector):
         result = self.users.delete_one({"_id": user["_id"]})
