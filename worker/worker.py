@@ -69,7 +69,7 @@ LOCK_FILE = Path(__file__).resolve().parent / "fishtest_worker.lock"
 MIN_GCC_MAJOR = 9
 MIN_GCC_MINOR = 3
 
-MIN_CLANG_MAJOR = 10
+MIN_CLANG_MAJOR = 11
 MIN_CLANG_MINOR = 0
 
 FASTCHESS_SHA = "e892ad92a74c8a4fd7184b9e4867b97ae8952685"
